@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+
+
+<div class="card card-primary " style="max-width: 80rem;">
+    <div class="card-header text-center">
+        <div class="row">
+            <div class="col">
+              <h4>Admin Cluster Dashboard</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-block">
+        {%block nav_tabs%}
+            {{ super() }}
+        {%endblock%}
+    <div class="table-responsive table-hover">
+    <br>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Cluster IP</th>
+            <!--<th>External Traffic Policy</th>-->
+            <!--<th>Node Port</th>-->
+            <th>Port</th>
+            <th>Protocol</th>
+            <th>Target Port</th>
+            <th>Selector Run</th>
+
+            <th>Type</th>
+            <th>Age</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for x in data %}
+        {% if x['Name'] != "kubernetes"%}
+        <tr>
+            <td>{{x['Name']}}</td>
+            <td>{{x['Info']['clusterIP']}}</td>
+            <!--<td>{{x['Info']['externalTrafficPolicy']}}</td>-->
+            {% for ports in x['Info']['ports'] %}
+            <!--<td>{{ ports['nodePort']}}</td>-->
+            <td>{{ ports['port']}}</td>
+            <td>{{ ports['protocol']}}</td>
+            <td>{{ ports['targetPort']}}</td>
+            {% endfor %}
+            <td>{{x['Info']['selector']['run']}}</td>
+            <td>{{x['Info']['type']}}</td>
+            <td>{{x['Age']}}</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    </div>
+</div>
+<script>
+        $("#register").hide();
+        $("#login").hide();
+        $("#servicesNavLink").addClass("active");
+</script>
+{% endblock %}
