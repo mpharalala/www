@@ -60,7 +60,7 @@ $(document).ready(function(){
                 strongPassword : true
             },
             mac_address:{
-                mac_address_regex : true
+//                mac_address_regex : true
             }
         },
     });
@@ -79,7 +79,11 @@ function user_exists(){
             function(data){
                 if(data['code']==100){
                     $(".form_toggle").removeClass("d-none")
-                    $("#login_btn").attr("onclick","register()");
+                    if ($("#login_btn").hasClass("login")){
+                        $("#login_btn").attr("onclick","log_in()");
+                    }else{
+                        $("#login_btn").attr("onclick","register()");
+                    }
                 }else{
                     if(data['code']=402){
                         growl(data["message"], "danger")
@@ -94,7 +98,6 @@ function user_exists(){
         .always(
             function(){
                 $("#login_btn").removeClass("disabled");
-                $("#login_btn").html("Log in");
             }
         )
         .fail(function()
@@ -149,7 +152,42 @@ function register(){
             function(data){
             if((data['code']==200)||(data['code']==500)||(data['code']==401)||(data['code']==404)){
                 if(data['code']==200){
-                    growl(data["message"], "success")
+                    location.replace("/dashboard/nodes");
+                }else{
+                    growl(data["message"], "danger")
+                }
+            }else{
+                growl("Internal Server Error. Please try again or contact admin", "danger")
+                $(".form_toggle").addClass("d-none")
+                $("#login_btn").attr("onclick","user_exists()");
+            }
+        })
+        .always(
+            function(){
+                $("#login_btn").html("Register Station");
+                $("#login_btn").removeClass("disabled");
+            })
+        .fail(function(){
+            growl("Internal Server Error. Please try again or contact admin", "danger")
+            $(".form_toggle").addClass("d-none")
+            $("#login_btn").attr("onclick","user_exists()");
+        })
+    }
+    return false;
+}
+
+function log_in(){
+    email = $("#email").val();
+    password = $("#passw").val();
+    if ($("#login_form").valid()){
+        $("#login_btn").html("Loading......");
+        $("#login_btn").addClass("disabled");
+        $.post("/login", {email:email,password:password})
+        .done(
+            function(data){
+            if((data['code']==100)||(data['code']==401)){
+                if(data['code']==100){
+                    location.replace("/dashboard/nodes");
                 }else{
                     growl(data["message"], "danger")
                 }

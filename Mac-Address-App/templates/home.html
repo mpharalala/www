@@ -1,8 +1,12 @@
 {%extends "base.html"%}
 {%block body%}
 <div class="card text-center">
-    <div class="card-header text-center"><h4>Register Base Station</h4></div>
-<h4>Login</h4>
+     {% if global_mac_address == "" %}
+        <div class="card-header text-center"><h4>Register Base Station</h4></div>
+    {% else %}
+        <div class="card-header text-center"><h4>Log Into Base Station</h4></div>
+    {% endif %}
+<h4>Enter Details</h4>
 
 <form id="login_form" onsubmit="return dontSubmit();">
     <div class="form-group" id="email_form_group">
@@ -18,6 +22,7 @@
             <input type="password" name="passw" id="passw" maxlength="100" placeholder="Enter Password" class="form-control" required>
         </div>
     </div>
+    {% if global_mac_address == "" %}
     <div class="form-group d-none form_toggle">
         <label class="col control-label">Base Station Name:</label>
         <div class="col">
@@ -30,11 +35,16 @@
             <input name="mac_address" id="mac_address" maxlength="100" placeholder="Enter Mac Address" class="form-control" required>
         </div>
     </div>
+    {% endif %}
     <div class="row" style="">
         <div class="col-xs-3 col-sm-3 col-md-3">
             <div class="form-group">
                 <div class="col">
-                <button type="button" onclick="user_exists();" id="login_btn" class=" btn btn-block btn-success">Login</button>
+                {% if global_mac_address == "" %}
+                    <button type="button" onclick="user_exists();" id="login_btn" class=" btn btn-block btn-success">Register Station</button>
+                {% else %}
+                    <button type="button" onclick="log_in();" id="login_btn" class="login btn btn-block btn-success">Login</button>
+                {% endif %}
                 </div>
             </div>
         </div>
