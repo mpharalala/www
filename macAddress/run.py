@@ -268,9 +268,10 @@ def create_service(name, port):
         return False
 
 
-@login_required
 @app.route('/dashboard/<string:method>', methods=["get","post"])
+@login_required
 def dashboard(method):
+    print current_user.is_authenticated
     if method == "nodes":
         nodes = get_nodes()
         if not nodes:
