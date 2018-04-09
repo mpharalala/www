@@ -35,6 +35,7 @@
 
             <th>Status</th>
             <th>Age</th>
+            <th>Delete</th>
         </tr>
         </thead>
         <tbody>
@@ -64,6 +65,13 @@
                 {% endif %}
             </td>
             <td>{{x['Age']}}</td>
+            <td>
+                <button onclick="delete_deployment('{{x['Name']}}')" class="btn btn-danger btn-xs" data-toggle="modal"
+                   data-target="#confirmModal">
+                    <span class="fa fa-trash-o"></span>
+                    Delete
+                </button>
+            </td>
             </tr>
         {% endfor %}
         {% endfor %}

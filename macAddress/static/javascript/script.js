@@ -9,6 +9,11 @@ $(document).ready(function(){
     });
 
 
+    $(".lowercase").keyup(function(){
+         $(this).val($(this).val().toLowerCase())
+    });
+
+
     $(".table").DataTable({
         "ordering":false,
         "searching":true,
@@ -127,14 +132,7 @@ function growl(message, type){
 
 
 function register_api(){
-    var win = window.open('http://192.168.0.59:5000/register', '_blank');
-    if (win) {
-        //Browser has allowed it to be opened
-        win.focus();
-    } else {
-        //Browser has blocked it
-        growl("Please allow popups for this website to access register site", "info")
-    }
+    window.location.href = 'http://192.168.0.59:5000/register';
 }
 
 
@@ -209,4 +207,70 @@ function log_in(){
         })
     }
     return false;
+}
+
+
+function delete_service(name) {
+    $("#confirm_modal_title").html("Remove Service")
+    $("#confirm_modal_body").html("Are you sure you want to remove "+name+' service?')
+    $('#delete').click(function(){
+        $('#delete').addClass("disabled")
+        $("#confirmModal").modal()
+        $.post("/delete/service/",{name:name})
+        .done(
+                function(data){
+                    if (data['code']=="200"){
+                        growl(data["message"],"success")
+                        location.reload();
+                    }else{
+                        if (data['code']=="500"){
+                            growl(data["message"],"danger")
+
+                        }else{
+                            growl("Internal Server Error. Please Try again or contact admin","danger")
+
+                        }
+                    }
+                }
+            )
+        .fail(
+        function(){
+            growl("Internal Server Error. Please Try again or contact admin","danger")
+
+        })
+        .always(
+             $('#delete').removeClass("disabled")
+        )
+    })
+}
+
+function delete_deployment(name) {
+    $("#confirm_modal_title").html("Remove deployment")
+    $("#confirm_modal_body").html("Are you sure you want to remove deployment "+name+"?")
+    $('#delete').click(function(){
+        $('#delete').addClass("disabled")
+        $("#confirmModal").modal()
+        $.post("/delete/deployment/",{name:name})
+        .done(
+                function(data){
+                    if (data['code']=="200"){
+                        growl(data["message"],"success")
+                        location.reload();
+                    }else{
+                        if (data['code']=="500"){
+                            growl(data["message"],"danger")
+                        }else{
+                            growl("Internal Server Error. Please Try again or contact admin","danger")
+                        }
+                    }
+                }
+            )
+        .fail(
+            function(){
+                growl("Internal Server Error. Please Try again or contact admin","danger")
+            })
+        .always(
+            $('#delete').removeClass("disabled")
+        )
+    })
 }

@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="44af3cd1-f015-4119-9495-0b4f5284789c" name="Default" comment="" />
+    <list default="true" id="44af3cd1-f015-4119-9495-0b4f5284789c" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/MacAddress/templates/updateService.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MacAddress/mac_address.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/macAddress/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/macAddress/run.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/macAddress/static/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/macAddress/static/css/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/macAddress/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/macAddress/templates/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/macAddress/templates/create_service.html" beforeDir="false" afterPath="$PROJECT_DIR$/macAddress/templates/create_service.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/macAddress/templates/deploy.html" beforeDir="false" afterPath="$PROJECT_DIR$/macAddress/templates/deploy.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/macAddress/templates/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/macAddress/templates/home.html" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -10,47 +20,98 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="run.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/macAddress/run.py">
+    <leaf>
+      <file leaf-file-name="run.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/MacAddress/run.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="553">
-              <caret line="115" column="22" selection-start-line="115" selection-start-column="22" selection-end-line="115" selection-end-column="22" />
+            <state relative-caret-position="293">
+              <caret line="381" column="29" lean-forward="true" selection-start-line="381" selection-start-column="29" selection-end-line="381" selection-end-column="29" />
               <folding>
                 <element signature="e#0#91#0" expanded="true" />
-                <element signature="e#2751#3259#0" />
-                <element signature="e#3337#3551#0" />
-                <element signature="e#3580#4449#0" />
-                <element signature="e#4538#6851#0" />
-                <element signature="e#6543#6626#0" />
-                <element signature="e#6998#7241#0" />
-                <element signature="e#6924#7231#0" />
-                <element signature="e#7630#7991#0" />
-                <element signature="e#8018#8438#0" />
-                <element signature="e#8468#8865#0" />
-                <element signature="e#8917#9383#0" />
-                <element signature="e#9422#9869#0" />
-                <element signature="e#9841#12537#0" />
+                <element signature="e#956#991#0" />
+                <element signature="e#1017#1235#0" />
+                <element signature="e#1269#1409#0" />
+                <element signature="e#1446#1734#0" />
+                <element signature="e#1774#2471#0" />
+                <element signature="e#2515#2552#0" />
+                <element signature="e#2594#2626#0" />
+                <element signature="e#2675#2715#0" />
+                <element signature="e#2747#3255#0" />
+                <element signature="e#3333#3547#0" />
+                <element signature="e#3577#4429#0" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="mac_address.txt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/macAddress/mac_address.txt">
-          <provider selected="true" editor-type-id="text-editor" />
+      <file leaf-file-name="create_service.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/MacAddress/templates/create_service.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="306">
+              <caret line="29" column="84" lean-forward="true" selection-start-line="29" selection-start-column="84" selection-end-line="29" selection-end-column="84" />
+              <folding>
+                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
+              </folding>
+            </state>
+          </provider>
         </entry>
       </file>
-      <file leaf-file-name="home.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/macAddress/templates/home.html">
+      <file leaf-file-name="deploy.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/MacAddress/templates/deploy.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="391">
+              <caret line="37" column="138" selection-start-line="37" selection-start-column="138" selection-end-line="37" selection-end-column="138" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="deployments.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/MacAddress/templates/deployments.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="512">
+              <caret line="69" column="47" lean-forward="true" selection-start-line="69" selection-start-column="47" selection-end-line="69" selection-end-column="47" />
+              <folding>
+                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="base.html" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/MacAddress/templates/base.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="323">
+              <caret line="20" column="42" selection-start-line="20" selection-start-column="42" selection-end-line="20" selection-end-column="42" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="services.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/MacAddress/templates/services.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="478">
+              <caret line="47" column="39" lean-forward="true" selection-start-line="47" selection-start-column="39" selection-end-line="47" selection-end-column="39" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="script.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/MacAddress/static/javascript/script.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="119">
-              <caret line="7" column="15" selection-start-line="7" selection-start-column="15" selection-end-line="7" selection-end-column="15" />
+              <caret line="7" column="34" lean-forward="true" selection-start-line="7" selection-start-column="34" selection-end-line="7" selection-end-column="34" />
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+      </list>
+    </option>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
@@ -58,6 +119,13 @@
       <find>global_mac_address</find>
       <find>current_user_is_owner</find>
       <find>print</find>
+      <find>growl</find>
+      <find>flash</find>
+      <find>c</find>
+      <find>home</find>
+      <find>wind</find>
+      <find>Failed to co</find>
+      <find>Failed to connect top</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -72,14 +140,26 @@
         <option value="$PROJECT_DIR$/Mac_Address/run.py" />
         <option value="$PROJECT_DIR$/macAddress/templates/home.html" />
         <option value="$PROJECT_DIR$/macAddress/run.py" />
+        <option value="$PROJECT_DIR$/MacAddress/templates/Update App.html" />
+        <option value="$PROJECT_DIR$/MacAddress/static/css/style.css" />
+        <option value="$PROJECT_DIR$/MacAddress/templates/deployments.html" />
+        <option value="$PROJECT_DIR$/MacAddress/templates/home.html" />
+        <option value="$PROJECT_DIR$/MacAddress/templates/create_service.html" />
+        <option value="$PROJECT_DIR$/MacAddress/templates/deploy.html" />
+        <option value="$PROJECT_DIR$/MacAddress/templates/UpdateDeployment.html" />
+        <option value="$PROJECT_DIR$/MacAddress/templates/updateService.html" />
+        <option value="$PROJECT_DIR$/MacAddress/static/javascript/script.js" />
+        <option value="$PROJECT_DIR$/MacAddress/templates/services.html" />
+        <option value="$PROJECT_DIR$/MacAddress/run.py" />
+        <option value="$PROJECT_DIR$/MacAddress/templates/base.html" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1912" />
-    <option name="y" value="-8" />
-    <option name="width" value="2576" />
-    <option name="height" value="1066" />
+    <option name="x" value="1918" />
+    <option name="y" value="9" />
+    <option name="width" value="1364" />
+    <option name="height" value="1075" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -87,33 +167,47 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
-              <item name="macAddress" type="b2602c69:ProjectViewProjectNode" />
-              <item name="macAddress" type="462c0819:PsiDirectoryNode" />
+              <item name="MacAddress" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MacAddress" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="macAddress" type="b2602c69:ProjectViewProjectNode" />
-              <item name="macAddress" type="462c0819:PsiDirectoryNode" />
-              <item name="macAddress" type="462c0819:PsiDirectoryNode" />
+              <item name="MacAddress" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MacAddress" type="462c0819:PsiDirectoryNode" />
+              <item name="MacAddress" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="macAddress" type="b2602c69:ProjectViewProjectNode" />
-              <item name="macAddress" type="462c0819:PsiDirectoryNode" />
-              <item name="macAddress" type="462c0819:PsiDirectoryNode" />
+              <item name="MacAddress" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MacAddress" type="462c0819:PsiDirectoryNode" />
+              <item name="MacAddress" type="462c0819:PsiDirectoryNode" />
+              <item name="static" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MacAddress" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MacAddress" type="462c0819:PsiDirectoryNode" />
+              <item name="MacAddress" type="462c0819:PsiDirectoryNode" />
+              <item name="static" type="462c0819:PsiDirectoryNode" />
+              <item name="javascript" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MacAddress" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MacAddress" type="462c0819:PsiDirectoryNode" />
+              <item name="MacAddress" type="462c0819:PsiDirectoryNode" />
               <item name="templates" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../flaskApp" />
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunDashboard">
@@ -128,7 +222,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.run (1)">
+  <component name="RunManager" selected="Python.run (2)">
     <configuration name="run (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="mac_address_app" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -142,6 +236,24 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/macAddress/run.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <configuration name="run (2)" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="mac_address_app" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/MacAddress" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/MacAddress/run.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -168,9 +280,11 @@
     <list>
       <item itemvalue="Python.run" />
       <item itemvalue="Python.run (1)" />
+      <item itemvalue="Python.run (2)" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.run (2)" />
         <item itemvalue="Python.run (1)" />
         <item itemvalue="Python.run" />
       </list>
@@ -193,14 +307,14 @@
     <frame x="1912" y="-8" width="2576" height="1066" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.16914062" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.16914062" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.21135646" />
-      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.21135646" />
+      <window_info anchor="bottom" id="Version Control" order="9" />
       <window_info anchor="bottom" id="Python Console" order="7" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Terminal" order="7" />
+      <window_info anchor="bottom" id="Terminal" order="8" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -217,10 +331,38 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="8" />
+      <option name="time" value="10" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/MacAddress/run.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1649">
+          <caret line="115" column="22" selection-start-line="115" selection-start-column="22" selection-end-line="115" selection-end-column="22" />
+          <folding>
+            <element signature="e#0#91#0" expanded="true" />
+            <element signature="e#956#991#0" />
+            <element signature="e#1017#1235#0" />
+            <element signature="e#1269#1409#0" />
+            <element signature="e#1446#1734#0" />
+            <element signature="e#1774#2471#0" />
+            <element signature="e#2515#2552#0" />
+            <element signature="e#2594#2626#0" />
+            <element signature="e#2675#2715#0" />
+            <element signature="e#2747#3255#0" />
+            <element signature="e#3333#3547#0" />
+            <element signature="e#3577#4429#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MacAddress/templates/home.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="7" column="15" selection-start-line="7" selection-start-column="15" selection-end-line="7" selection-end-column="15" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Mac-Address-App/run.py" />
     <entry file="file://$PROJECT_DIR$/Mac-Address-App/run.py" />
     <entry file="file://$PROJECT_DIR$/Mac-Address-App/run.py" />
@@ -229,36 +371,106 @@
     <entry file="file://$PROJECT_DIR$/Mac-Address-App/mac_address.txt" />
     <entry file="file://$PROJECT_DIR$/Mac-Address-App/run.py" />
     <entry file="file://$PROJECT_DIR$/Mac_Address/run.py" />
-    <entry file="file://$PROJECT_DIR$/macAddress/templates/home.html">
+    <entry file="file://$PROJECT_DIR$/MacAddress/static/css/style.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" column="15" selection-start-line="7" selection-start-column="15" selection-end-line="7" selection-end-column="15" />
+        <state relative-caret-position="255">
+          <caret line="15" column="11" selection-start-line="15" selection-start-column="4" selection-end-line="15" selection-end-column="21" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/macAddress/mac_address.txt">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/macAddress/run.py">
+    <entry file="file://$PROJECT_DIR$/MacAddress/templates/home.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="553">
-          <caret line="115" column="22" selection-start-line="115" selection-start-column="22" selection-end-line="115" selection-end-column="22" />
+        <state relative-caret-position="102">
+          <caret line="186" column="12" lean-forward="true" selection-start-line="186" selection-start-column="12" selection-end-line="186" selection-end-column="12" />
+          <folding>
+            <element signature="n#style#0;n#!!top" />
+            <element signature="n#style#0;n#div#1;n#!!top" expanded="true" />
+            <element signature="n#div#1;n#!!top" />
+            <element signature="n#script#0;n#!!top" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MacAddress/templates/UpdateDeployment.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="487">
+          <caret line="47" column="38" lean-forward="true" selection-start-line="47" selection-start-column="38" selection-end-line="47" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MacAddress/templates/updateService.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="351">
+          <caret line="33" column="30" lean-forward="true" selection-start-line="33" selection-start-column="30" selection-end-line="33" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MacAddress/static/javascript/script.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="7" column="34" lean-forward="true" selection-start-line="7" selection-start-column="34" selection-end-line="7" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MacAddress/templates/services.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="478">
+          <caret line="47" column="39" lean-forward="true" selection-start-line="47" selection-start-column="39" selection-end-line="47" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MacAddress/run.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="293">
+          <caret line="381" column="29" lean-forward="true" selection-start-line="381" selection-start-column="29" selection-end-line="381" selection-end-column="29" />
           <folding>
             <element signature="e#0#91#0" expanded="true" />
-            <element signature="e#2751#3259#0" />
-            <element signature="e#3337#3551#0" />
-            <element signature="e#3580#4449#0" />
-            <element signature="e#4538#6851#0" />
-            <element signature="e#6543#6626#0" />
-            <element signature="e#6998#7241#0" />
-            <element signature="e#6924#7231#0" />
-            <element signature="e#7630#7991#0" />
-            <element signature="e#8018#8438#0" />
-            <element signature="e#8468#8865#0" />
-            <element signature="e#8917#9383#0" />
-            <element signature="e#9422#9869#0" />
-            <element signature="e#9841#12537#0" />
+            <element signature="e#956#991#0" />
+            <element signature="e#1017#1235#0" />
+            <element signature="e#1269#1409#0" />
+            <element signature="e#1446#1734#0" />
+            <element signature="e#1774#2471#0" />
+            <element signature="e#2515#2552#0" />
+            <element signature="e#2594#2626#0" />
+            <element signature="e#2675#2715#0" />
+            <element signature="e#2747#3255#0" />
+            <element signature="e#3333#3547#0" />
+            <element signature="e#3577#4429#0" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MacAddress/templates/create_service.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="29" column="84" lean-forward="true" selection-start-line="29" selection-start-column="84" selection-end-line="29" selection-end-column="84" />
+          <folding>
+            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MacAddress/templates/deploy.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="37" column="138" selection-start-line="37" selection-start-column="138" selection-end-line="37" selection-end-column="138" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MacAddress/templates/deployments.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="512">
+          <caret line="69" column="47" lean-forward="true" selection-start-line="69" selection-start-column="47" selection-end-line="69" selection-end-column="47" />
+          <folding>
+            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MacAddress/templates/base.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="20" column="42" selection-start-line="20" selection-start-column="42" selection-end-line="20" selection-end-column="42" />
         </state>
       </provider>
     </entry>

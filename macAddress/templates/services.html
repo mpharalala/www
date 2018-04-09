@@ -25,14 +25,15 @@
             <th>Name</th>
             <th>Cluster IP</th>
             <!--<th>External Traffic Policy</th>-->
-            <!--<th>Node Port</th>-->
+            <th>Node Port</th>
             <th>Port</th>
             <th>Protocol</th>
             <th>Target Port</th>
-            <th>Selector Run</th>
+
 
             <th>Type</th>
             <th>Age</th>
+            <th>Delete</th>
         </tr>
         </thead>
         <tbody>
@@ -43,14 +44,20 @@
             <td>{{x['Info']['clusterIP']}}</td>
             <!--<td>{{x['Info']['externalTrafficPolicy']}}</td>-->
             {% for ports in x['Info']['ports'] %}
-            <!--<td>{{ ports['nodePort']}}</td>-->
+            <td>{{ ports['nodePort']}}</td>
             <td>{{ ports['port']}}</td>
             <td>{{ ports['protocol']}}</td>
             <td>{{ ports['targetPort']}}</td>
             {% endfor %}
-            <td>{{x['Info']['selector']['run']}}</td>
             <td>{{x['Info']['type']}}</td>
             <td>{{x['Age']}}</td>
+            <td>
+                <button onclick="delete_service('{{x['Name']}}')" class="btn btn-danger btn-xs" data-toggle="modal"
+                   data-target="#confirmModal">
+                    <span class="fa fa-trash-o"></span>
+                    Delete
+                </button>
+            </td>
         </tr>
         {% endif %}
         {% endfor %}

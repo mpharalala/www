@@ -10,8 +10,8 @@ import json
 
 app = Flask(__name__)
 api = Api(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:pass@192.168.8.102/addresses'
-app.config['SQLALCHEMY_BINDS'] = {"users_database": "mysql://root:pass@192.168.8.102/users"}
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:pass@192.168.0.2/addresses'
+app.config['SQLALCHEMY_BINDS'] = {"users_database": "mysql://root:pass@192.168.0.2/users"}
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = "random string"
 db = SQLAlchemy(app)
@@ -132,6 +132,30 @@ class LogIn(Resource):
             return {"message": "Invalid username or password", "code": 401}
 
 
+class Services(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument("name", type=str, help="Please enter a valid service name", required=True)
+        args = parser.parse_args()
+        response = delete_service(args['name'])
+        if response['status'] == "Failure":
+            return {"message": "Failed to delete service. Try again", "code": 500}
+        if response['status'] == "Success":
+            return {"message": "Service removed successfully", "code": 200}
+
+
+class Deployments(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument("name", type=str, help="Please enter a valid deployment name", required=True)
+        args = parser.parse_args()
+        response = delete_deployment(args['name'])
+        if response['status'] == "Failure":
+            return {"message": "Failed to delete deployment. Try again", "code": 500}
+        if response['status'] == "Success":
+            return {"message": "Deployment removed successfully", "code": 200}
+
+
 class Address(Resource):
     def post(self):
         parser = reqparse.RequestParser()
@@ -175,6 +199,8 @@ class Address(Resource):
 
 @app.route('/')
 def home():
+    logout_user()
+    session.clear()
     return render_template("home.html", title="Home", global_mac_address=get_address())
 
 
@@ -254,15 +280,78 @@ def deploy_app(name, image, port, replicas):
         return False
 
 
+def update_deployment(name, image, port, replicas):
+    try:
+        owner = 0
+        if current_user_is_owner():
+            owner = 1
+        deploy = requests.post('http://{}:5000'.format(kubeApiIpAddress),
+                               data={'method': 'update_deployment', 'namespace': current_user.email, 'name': name, "image": image, "replicas": replicas, "port": port, "owner":owner})
+        deploy_json = json.loads(deploy.content)
+        return deploy_json
+    except Exception as e:
+        print e
+        return False
+
+
+def delete_deployment(name):
+    try:
+        owner = 0
+        if current_user_is_owner():
+            owner = 1
+        delete = requests.post('http://{}:5000'.format(kubeApiIpAddress),
+                               data={'method': 'delete_deployment', 'namespace': current_user.email, 'name': name, "owner":owner})
+        print delete.content
+        delete_json = json.loads(delete.content)
+        return delete_json
+    except Exception as e:
+        print e
+        return False
+
+
 def create_service(name, port):
     try:
         owner = 0
         if current_user_is_owner():
             owner = 1
-        service = requests.post('http://{}:5000'.format(kubeApiIpAddress),
-                               data={'method': 'service', 'namespace': current_user.email, 'name': name, "port": port, "owner":owner})
+        check_deployment = requests.post('http://{}:5000'.format(kubeApiIpAddress),
+                               data={'method': 'check_deployment', 'namespace': current_user.email, 'name': name})
+        print check_deployment.text
+        if check_deployment.text == "1":
+            service = requests.post('http://{}:5000'.format(kubeApiIpAddress),
+                                   data={'method': 'service', 'namespace': current_user.email, 'name': name, "port": port, "owner":owner})
+        else:
+            return "NotAvailable"
         create_service_json = json.loads(service.content)
         return create_service_json
+    except Exception as e:
+        print e
+        return False
+
+
+def update_service(name, port):
+    try:
+        owner = 0
+        if current_user_is_owner():
+            owner = 1
+        service = requests.post('http://{}:5000'.format(kubeApiIpAddress),
+                               data={'method': 'update_service', 'namespace': current_user.email, 'name': name, "port": port, "owner":owner})
+        create_service_json = json.loads(service.content)
+        return create_service_json
+    except Exception as e:
+        print e
+        return False
+
+
+def delete_service(name):
+    try:
+        owner = 0
+        if current_user_is_owner():
+            owner = 1
+        delete_service = requests.post('http://{}:5000'.format(kubeApiIpAddress),
+                               data ={'method': 'delete_service', 'namespace': current_user.email, 'name': name, "owner":owner})
+        delete_service_json = json.loads(delete_service.content)
+        return delete_service_json
     except Exception as e:
         print e
         return False
@@ -271,41 +360,40 @@ def create_service(name, port):
 @app.route('/dashboard/<string:method>', methods=["get","post"])
 @login_required
 def dashboard(method):
-    print current_user.is_authenticated
     if method == "nodes":
         nodes = get_nodes()
         if not nodes:
             if nodes == {} or nodes == []:
-                flash("Could not find any nodes")
+                flash("Could not find any nodes", 'danger')
             else:
-                flash("Failed to connect top API. Try Again")
+                flash("Failed to connect to API. Try Again", 'danger')
                 nodes = {}
         return render_template("nodes.html", data=nodes, title="Dashboard")
     elif method == "pods":
         data = get_pods()
         if not data:
             if data == {} or data == []:
-                flash("Could not find any pods")
+                flash("Could not find any pods", 'danger')
             else:
-                flash("Failed to connect top API. Try Again")
+                flash("Failed to connect to API. Try Again",'danger')
                 data = {}
         return render_template("pods.html", data=data, title="Dashboard")
     elif method == "services":
         data = get_services()
         if not data:
             if data == {} or data == []:
-                flash("No services found")
+                flash("No services found",'danger')
             else:
-                flash("Failed to connect top API. Try Again")
+                flash("Failed to connect to API. Try Again", 'danger')
                 data = {}
         return render_template("services.html", data=data, title="Dashboard")
     elif method == "deployments":
         data = get_deployments()
         if not data:
             if data == {} or data == []:
-                flash("There are no apps currently deployed")
+                flash("There are no apps currently deployed", 'danger')
             else:
-                flash("Failed to connect top API. Try Again")
+                flash("Failed to connect to API. Try Again", 'danger')
                 data = {}
         return render_template("deployments.html", data=data, title="Dashboard")
     elif method == "deploy":
@@ -316,31 +404,67 @@ def dashboard(method):
             replicas = request.values.get("replicas")
             deploy_json = deploy_app(name, image, port, replicas)
             if deploy_json['status'] != "Failure":
-                flash("App Successfully Deployed")
+                flash("App Successfully Deployed", 'success')
                 return redirect(url_for("dashboard", method="deployments"))
             else:
-                flash("Failed to deploy App. {}".format(deploy_json['reason']))
+                flash("Failed to deploy App. {}".format(deploy_json['reason'], 'danger'))
         return render_template("deploy.html", title="Dashboard")
     elif method == "create_service":
         if request.method == "POST":
             name = request.values.get("name")
             port = request.values.get("port")
             deploy_json = create_service(name, port)
-            if deploy_json['status'] != "Failure":
-                flash("Service Successfully Created")
+            if deploy_json == "NotAvailable":
+                flash("Deployment Not Available", "danger")
+            else:
+                if deploy_json['status'] != "Failure":
+                    flash("Service Successfully Created", 'success')
+                    return redirect(url_for("dashboard", method="services"))
+                else:
+                    flash("Failed to create service. {}".format(deploy_json['reason']), 'danger')
+        return render_template("create_service.html", title="Dashboard")
+    elif method == "update_deployment":
+        if request.method == "POST":
+            name = request.values.get("name")
+            image = request.values.get("image")
+            port = request.values.get("port")
+            replicas = request.values.get("replicas")
+            update_deployment_json = update_deployment(name, image, port, replicas)
+            if update_deployment_json['status'] != "Failure":
+                flash("App Successfully Deployed", 'success')
+                return redirect(url_for("dashboard", method="deployments"))
+            else:
+                flash("Failed to update App. {}".format(update_deployment_json['reason']), 'danger')
+        return render_template("updateDeployment.html", title="Dashboard")
+    elif method == "update_service":
+        if request.method == "POST":
+            name = request.values.get("name")
+            port = request.values.get("port")
+            update_json = update_service(name, port)
+            if update_json['status'] != "Failure":
+                flash("Service Successfully Created", 'success')
                 return redirect(url_for("dashboard", method="services"))
             else:
-                flash("Failed to create service. {}".format(deploy_json['reason']))
-        return render_template("create_service.html", title="Dashboard")
+                flash("Failed to update service. {}".format(update_json['reason']), 'danger')
+        return render_template("updateService.html", title="Dashboard")
     else:
         abort(404)
 
 
+@app.route('/log_out')
+@login_required
+def logout():
+    logout_user()
+    session.clear()
+    return redirect(url_for("home"))
+
 api.add_resource(UserApi, '/user_exists')
 api.add_resource(LogIn, '/login')
 api.add_resource(Address, '/register_address')
+api.add_resource(Deployments, '/delete/deployment/')
+api.add_resource(Services, '/delete/service/')
 
 
 if __name__ == "__main__":
     db.create_all()
-    app.run()
+    app.run(port=5001, debug=True)
