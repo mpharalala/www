@@ -10,8 +10,8 @@ import json
 
 app = Flask(__name__)
 api = Api(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:pass@192.168.0.2/addresses'
-app.config['SQLALCHEMY_BINDS'] = {"users_database": "mysql://root:pass@192.168.0.2/users"}
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:pass@192.168.8.102/addresses'
+app.config['SQLALCHEMY_BINDS'] = {"users_database": "mysql://root:pass@192.168.8.102/users"}
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = "random string"
 db = SQLAlchemy(app)
@@ -20,37 +20,23 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "home"
 login_manager.login_message = "Please Logging First"
-try:
-    mac_address_file = open("mac_address.txt")
-except:
-    mac_address_file = open("mac_address.txt", "w+")
-global_mac_address = mac_address_file.read()
-mac_address_file.close()
-if global_mac_address == "":
-    print "null"
-else:
-    print global_mac_address
 
 kubeApiIpAddress = "localhost"
 
 
 @login_manager.user_loader
 def load_user(user_id):
+    return User.query.get(int(user_id))
+
+
+def get_address():
     try:
         mac_address_file = open("mac_address.txt")
     except:
         mac_address_file = open("mac_address.txt", "w+")
-    global_mac_address = mac_address_file.read()
+    mac_address = mac_address_file.read()
     mac_address_file.close()
-    if global_mac_address == "":
-        print "null"
-    else:
-        print global_mac_address
-    return User.query.get(int(user_id))
-
-
-def load_address_file():
-
+    return mac_address
 
 
 class Addresses(db.Model):
@@ -179,7 +165,7 @@ class Address(Resource):
 
 @app.route('/')
 def home():
-    return render_template("home.html", title="Home", global_mac_address=global_mac_address)
+    return render_template("home.html", title="Home", global_mac_address=get_address())
 
 
 def get_nodes():
@@ -193,10 +179,9 @@ def get_nodes():
 
 
 def current_user_is_owner():
-    address = MacAddresses.query.filter_by(mac_address=global_mac_address).first()
+    address = MacAddresses.query.filter_by(mac_address=get_address()).first()
     schema = MacAddressesSchema()
     results = schema.dump(address).data
-    print results
     if results:
         if current_user.id == results['user_id']:
             return True
