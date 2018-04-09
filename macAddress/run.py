@@ -102,6 +102,17 @@ class UserApi(Resource):
             return {"message": "You are not registered. Register First", "code": 402}
 
 
+#Check if the base station is registerd
+def base_station_registered():
+    address = MacAddresses.query.filter_by(mac_address=get_address()).first()
+    schema = MacAddressesSchema()
+    results = schema.dump(address).data
+    if results:
+        return True
+    else:
+        return False
+
+
 class LogIn(Resource):
     def post(self):
         parser = reqparse.RequestParser()
@@ -111,7 +122,6 @@ class LogIn(Resource):
         data = User.query.filter_by(email=args['email']).first()
         schema = UsersSchema()
         re = schema.dump(data).data
-        print re
         if re:
             if (re['email'] == args['email']) and (re['password'] == hashlib.sha256(args['password']).hexdigest()):
                 login_user(data)
@@ -207,7 +217,6 @@ def get_pods():
 def get_services():
     try:
         owner = 0
-        print current_user_is_owner()
         if current_user_is_owner():
             owner = 1
         services = requests.get('http://{}:5000'.format(kubeApiIpAddress), data={'method': 'get_services', 'namespace': current_user.email, "owner":owner})
@@ -259,12 +268,13 @@ def create_service(name, port):
         return False
 
 
+@login_required
 @app.route('/dashboard/<string:method>', methods=["get","post"])
 def dashboard(method):
     if method == "nodes":
         nodes = get_nodes()
         if not nodes:
-            if nodes == {}or nodes == []:
+            if nodes == {} or nodes == []:
                 flash("Could not find any nodes")
             else:
                 flash("Failed to connect top API. Try Again")
@@ -281,7 +291,6 @@ def dashboard(method):
         return render_template("pods.html", data=data, title="Dashboard")
     elif method == "services":
         data = get_services()
-        print data
         if not data:
             if data == {} or data == []:
                 flash("No services found")
@@ -291,7 +300,6 @@ def dashboard(method):
         return render_template("services.html", data=data, title="Dashboard")
     elif method == "deployments":
         data = get_deployments()
-        print data
         if not data:
             if data == {} or data == []:
                 flash("There are no apps currently deployed")
@@ -306,7 +314,6 @@ def dashboard(method):
             port = request.values.get("port")
             replicas = request.values.get("replicas")
             deploy_json = deploy_app(name, image, port, replicas)
-            print deploy_json
             if deploy_json['status'] != "Failure":
                 flash("App Successfully Deployed")
                 return redirect(url_for("dashboard", method="deployments"))
@@ -335,4 +342,4 @@ api.add_resource(Address, '/register_address')
 
 if __name__ == "__main__":
     db.create_all()
-    app.run(port=5001, host="0.0.0.0", debug=True)
+    app.run(port=5001)
