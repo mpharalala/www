@@ -379,7 +379,7 @@ def dashboard(method):
             if data == {} or data == []:
                 flash("Could not find any pods", 'danger')
             else:
-                flash("Failed to connect to API. Try Again",'danger')
+                flash("Establishing Connection ...", 'info')
                 data = {}
         return render_template("pods.html", data=data, title="Dashboard")
     elif method == "services":
@@ -388,7 +388,7 @@ def dashboard(method):
             if data == {} or data == []:
                 flash("No services found",'danger')
             else:
-                flash("Failed to connect to API. Try Again", 'danger')
+                flash("Establishing Connection ...", 'info')
                 data = {}
         return render_template("services.html", data=data, title="Dashboard")
     elif method == "deployments":
@@ -397,7 +397,7 @@ def dashboard(method):
             if data == {} or data == []:
                 flash("There are no apps currently deployed", 'danger')
             else:
-                flash("Failed to connect to API. Try Again", 'danger')
+                flash("Establishing Connection ...", 'info')
                 data = {}
         return render_template("deployments.html", data=data, title="Dashboard")
     elif method == "deploy":
