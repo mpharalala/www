@@ -211,7 +211,10 @@ def get_nodes():
         return json_nodes
     except Exception as e:
         print e
-        return False
+        if str(e) == "No JSON object could be decoded":
+            return "Non_Json"
+        else:
+            return False
 
 
 def current_user_is_owner():
@@ -362,12 +365,15 @@ def delete_service(name):
 def dashboard(method):
     if method == "nodes":
         nodes = get_nodes()
-        if not nodes:
-            if nodes == {} or nodes == []:
-                flash("Could not find any nodes", 'danger')
+        if nodes == {} or nodes == [] or nodes == "Non_Json":
+            flash("Please wait while cluster is booting up", 'info')
+            nodes = {}
+        else:
+            if nodes == False:
+                flash("Establishing Connection ...", 'info')
             else:
-                flash("Failed to connect to API. Try Again", 'danger')
-                nodes = {}
+                flash("Please wait while the cluster boots up", 'info')
+            nodes = {}
         return render_template("nodes.html", data=nodes, title="Dashboard")
     elif method == "pods":
         data = get_pods()
