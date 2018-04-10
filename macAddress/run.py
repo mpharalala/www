@@ -371,9 +371,7 @@ def dashboard(method):
         else:
             if nodes == False:
                 flash("Establishing Connection ...", 'info')
-            else:
-                flash("Please wait while the cluster boots up", 'info')
-            nodes = {}
+                nodes = {}
         return render_template("nodes.html", data=nodes, title="Dashboard")
     elif method == "pods":
         data = get_pods()
