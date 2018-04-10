@@ -6,4 +6,4 @@ flask_marshmallow
 passlib
 mysqlclient
 requests
-flask_logging
+flask_login
