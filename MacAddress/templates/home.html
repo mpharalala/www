@@ -1,0 +1,186 @@
+{%extends "base.html"%}
+{%block body%}
+<style>
+#canvas, #text {
+	position: absolute;
+	display: block;
+	top: 0;
+	left: 0;
+	z-index: -1;
+}
+</style>
+<canvas id="canvas"></canvas>
+<div class="card text-center" style="max-width: 50rem;">
+     {% if not registered %}
+        <div class="card-header text-center"><h4>Register Base Station</h4></div>
+    {% else %}
+        <div class="card-header text-center"><h4>Log Into Base Station</h4></div>
+    {% endif %}
+<h4>Enter Details</h4>
+
+<form id="login_form" onsubmit="return dontSubmit();">
+    <div class="form-group" id="email_form_group">
+        <div class="col">
+            <input type="email" name="email" id='email' maxlength="100" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                   title="Input Valid email address" placeholder="Enter Email Address Here.." class="form-control" required>
+        </div>
+    </div>
+    <div class="form-group d-none form_toggle">
+        <label class="col control-label">Password:</label>
+        <div class="col">
+            <input type="password" name="passw" id="passw" maxlength="100" placeholder="Enter Password" class="form-control" required>
+        </div>
+    </div>
+    {% if not registered %}
+    <div class="form-group d-none form_toggle">
+        <label class="col control-label">Base Station Name:</label>
+        <div class="col">
+            <input name="base_station_name" id="base_station_name" maxlength="100" placeholder="Enter Base Station Name" class="form-control firstLetterUpperCase" required>
+        </div>
+    </div>
+    <div class="form-group d-none form_toggle">
+        <label class="col control-label">Base Station Mac Address:</label>
+        <div class="col">
+            <input name="mac_address" value="{{global_mac_address}}" id="mac_address" disabled maxlength="100" class="disabled form-control" required>
+        </div>
+    </div>
+    {% endif %}
+    <div class="row" style="">
+        <div class="col-xs-4 col-sm-4 col-md-4">
+            <div class="form-group">
+                <div class="col">
+                {% if not registered%}
+                    <button type="button" onclick="user_exists();" id="login_btn" class=" btn btn-block btn-success">Register Base Station</button>
+                {% else %}
+                    <button type="button" onclick="log_in();" id="login_btn" class="login btn btn-block btn-success">Log In</button>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-5 col-sm-5 col-md-5"></div>
+        <div class="col-xs-3 col-sm-3 col-md-3">
+            <div class="form-group">
+                <div class="col">
+                <a id="register_btn" class=" btn btn-block btn-danger">Register User</a>
+                </div>
+            </div>
+        </div>
+    </div>
+<br>
+    </form>
+    </div>
+ <script>
+
+            let resizeReset = function() {
+                w = canvasBody.width = window.innerWidth;
+                h = canvasBody.height = window.innerHeight;
+            }
+
+            const opts = {
+                particleColor: "rgb(99, 172, 154)",
+                lineColor: "rgb(176,199,96)",
+                particleAmount: 65,
+                defaultSpeed: 1,
+                variantSpeed: 1,
+                defaultRadius: 2,
+                variantRadius: 2,
+                linkRadius: 200,
+            };
+
+            window.addEventListener("resize", function(){
+                deBouncer();
+            });
+
+            let deBouncer = function() {
+                clearTimeout(tid);
+                tid = setTimeout(function() {
+                    resizeReset();
+                }, delay);
+            };
+
+            let checkDistance = function(x1, y1, x2, y2){
+                return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            };
+
+            let linkPoints = function(point1, hubs){
+                for (let i = 0; i < hubs.length; i++) {
+                    let distance = checkDistance(point1.x, point1.y, hubs[i].x, hubs[i].y);
+                    let opacity = 1 - distance / opts.linkRadius;
+                    if (opacity > 0) {
+                        drawArea.lineWidth = 0.5;
+                        drawArea.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${opacity})`;
+                        drawArea.beginPath();
+                        drawArea.moveTo(point1.x, point1.y);
+                        drawArea.lineTo(hubs[i].x, hubs[i].y);
+                        drawArea.closePath();
+                        drawArea.stroke();
+                    }
+                }
+            }
+
+            Particle = function(xPos, yPos){
+                this.x = Math.random() * w;
+                this.y = Math.random() * h;
+                this.speed = opts.defaultSpeed + Math.random() * opts.variantSpeed;
+                this.directionAngle = Math.floor(Math.random() * 360);
+                this.color = opts.particleColor;
+                this.radius = opts.defaultRadius + Math.random() * opts. variantRadius;
+                this.vector = {
+                    x: Math.cos(this.directionAngle) * this.speed,
+                    y: Math.sin(this.directionAngle) * this.speed
+                };
+                this.update = function(){
+                    this.border();
+                    this.x += this.vector.x;
+                    this.y += this.vector.y;
+                };
+                this.border = function(){
+                    if (this.x >= w || this.x <= 0) {
+                        this.vector.x *= -1;
+                    }
+                    if (this.y >= h || this.y <= 0) {
+                        this.vector.y *= -1;
+                    }
+                    if (this.x > w) this.x = w;
+                    if (this.y > h) this.y = h;
+                    if (this.x < 0) this.x = 0;
+                    if (this.y < 0) this.y = 0;
+                };
+                this.draw = function(){
+                    drawArea.beginPath();
+                    drawArea.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+                    drawArea.closePath();
+                    drawArea.fillStyle = this.color;
+                    drawArea.fill();
+                };
+            };
+
+            function setup(){
+                particles = [];
+                resizeReset();
+                for (let i = 0; i < opts.particleAmount; i++){
+                    particles.push( new Particle() );
+                }
+                window.requestAnimationFrame(loop);
+            }
+
+            function loop(){
+                window.requestAnimationFrame(loop);
+                drawArea.clearRect(0,0,w,h);
+                for (let i = 0; i < particles.length; i++){
+                    particles[i].update();
+                    particles[i].draw();
+                }
+                for (let i = 0; i < particles.length; i++){
+                    linkPoints(particles[i], particles);
+                }
+            }
+
+            const canvasBody = document.getElementById("canvas"),
+            drawArea = canvasBody.getContext("2d");
+            let delay = 200, tid,
+            rgb = opts.lineColor.match(/\d+/g);
+            resizeReset();
+            setup();
+    </script>
+{%endblock%}

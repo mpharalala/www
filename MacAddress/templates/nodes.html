@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+
+
+<div class="card card-primary " style="max-width: 80rem;">
+    <div class="card-header text-center">
+        <div class="row">
+            <div class="col">
+              <h4>Admin Cluster Dashboard</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-block">
+        {%block nav_tabs%}
+            {{ super() }}
+        {%endblock%}
+    <div class="table-responsive table-hover">
+    <br>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Disk</th>
+            <th>Memory</th>
+            <th>Disk Pressure</th>
+            <th>Age</th>
+            <th>Activity</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for x in data %}
+        <tr>
+            <td>{{x['Name']}}</td>
+            {% if x['Ready'] == "True" %}
+                <td>Sufficient disk space available</td>
+                <td>Sufficient memory available</td>
+                <td>No disk pressure</td>
+            {% else %}
+                <td>Node is not ready</td>
+                <td>Node is not ready</td>
+                <td>Node is not ready</td>
+            {% endif %}
+            <td>{{x['Age']}}</td>
+            <td class="text-center">
+            {% if x['Ready'] == "True" %}
+                 <label class="">
+                    <span style="color:green" class="fa fa-check-circle fa-2x"></span>
+                </label>
+                {% else %}
+                <label class="">
+                    <span style="color:red" class="fa fa-times-circle fa-2x"></span>
+                </label>
+            {% endif %}
+            </td>
+            <td>
+            <span>
+                {% if x['Ready'] == "True" %}
+                    Ready
+                {% else %}
+                    Dead
+                {% endif %}
+            </span>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+    </div>
+</div>
+<script>
+        $("#register").hide();
+        $("#login").hide();
+        $("#nodesNavLink").addClass("active");
+</script>
+{% endblock %}

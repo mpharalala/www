@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+
+
+<div class="card card-primary" >
+        <div class="card-header text-center">
+            <div class="row">
+                <div class="col">
+                  <h4>Admin Cluster Dashboard</h4>
+                </div>
+            </div>
+        </div>
+        <div class="card-block">
+            {%block nav_tabs%}
+            {{ super() }}
+            {%endblock%}
+            <br>
+             <div class="row">
+                  <div class="col-sm-1">
+                                <div class="text-center">
+                                  <h6></h6>
+                                </div>
+                            </div>
+                  <div class="col-sm-9 ">
+                    <h4>Deploy App</h4>
+                    <form method="post" id="deploy_app_form" action="/dashboard/deploy" >
+                        <div class="form-group">
+                            <label class="col control-label">Name</label>
+                            <div class="col">
+                                <input type="text" name="name" id="name" placeholder="Enter App Name" class="form-control lowercase" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col control-label">Image</label>
+                            <div class="col">
+                            <input type="text" name="image" id="image" placeholder="Enter Docker Image Name" class="form-control lowercase" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label class="col control-label">Container Port</label>
+                                    <div class="col">
+                                        <input type="number" min="1" name="port" id="port" placeholder="Port" class="form-control" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label class="col control-label">Replicas</label>
+                                    <div class="col">
+                                        <input type="number" min="1" name="replicas" id="replicas" placeholder="Replicas" class="form-control" required>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        <div class="form-group">
+                        <div class="col">
+                            <button id="submit" type="submit" class="btn btn-success btn-md">
+                                Deploy App
+                            </button>
+                        </div>
+                        </div>
+                        <br>
+                    </form>
+                  </div>
+            </div>
+        </div>
+    </div>
+<script>
+        $("#register").hide();
+        $("#login").hide();
+        $("#deployAppNavLink").addClass("active");
+</script>
+{% endblock %}
