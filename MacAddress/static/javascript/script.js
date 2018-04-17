@@ -25,12 +25,6 @@ $(document).ready(function(){
     });
 
 
-    $(".table").DataTable({
-        "ordering":false,
-        "searching":true,
-        "paging":true
-    });
-
 
     $.validator.setDefaults({
         errorClass: 'text-danger',
@@ -85,6 +79,7 @@ $(document).ready(function(){
 
 function dontSubmit(){
     return false;
+
 }
 
 function user_exists(){
@@ -126,7 +121,6 @@ function user_exists(){
     return false;
 }
 
-
 function growl(message, type){
     $.bootstrapGrowl(message, {
                       ele: 'body', // which element to append to
@@ -139,8 +133,6 @@ function growl(message, type){
                       stackup_spacing: 10 // spacing between consecutively stacked growls.
     });
 }
-
-
 
 function register(){
     email = $("#email").val();
@@ -222,15 +214,18 @@ function log_in(){
     return false;
 }
 
-
 function delete_service(name) {
     $("#confirm_modal_title").html("Remove Service")
     $("#confirm_modal_body").html("Are you sure you want to remove "+name+' service?')
+    $("#delete").off();
     $('#delete').click(function(){
         $('#delete').addClass("disabled")
         $("#confirmModal").modal('hide')
-        $.post("/delete/service/",{name:name})
-        .done(
+        $.ajax({
+            url:"/services",
+            data:{name:name},
+            method: "DELETE"
+        }).done(
                 function(data){
                     if (data['code']=="200"){
                         location.reload();
@@ -244,7 +239,7 @@ function delete_service(name) {
                         }
                     }
                 }
-            )
+        )
         .fail(
         function(){
             growl("Internal Server Error. Please Try again or contact admin","danger")
@@ -256,10 +251,15 @@ function delete_service(name) {
 function delete_deployment(name) {
     $("#confirm_modal_title").html("Remove deployment")
     $("#confirm_modal_body").html("Are you sure you want to remove deployment "+name+"?")
+    $("#delete").off();
     $('#delete').click(function(){
         $('#delete').addClass("disabled")
         $("#confirmModal").modal('hide')
-        $.post("/delete/deployment/",{name:name})
+        $.ajax({
+            url:"/deployments",
+            data:{name:name},
+            type:"DELETE"
+        })
         .done(
                 function(data){
                     if (data['code']=="200"){
@@ -280,4 +280,61 @@ function delete_deployment(name) {
                 $('#delete').removeClass("disabled")
             })
     })
+}
+
+function create_table(table_name){
+    var columns = []
+    if (table_name=="nodes"){
+        columns = [{"data": "Name"}, {"data": "Disk"}, {"data": "Memory"}, {"data": "Disk Pressure"},
+                              {"data": "Age"}, {"data": "Activity"}, {"data": "Status"}]
+    }else if (table_name=="pods"){
+        columns = [{data: "Name",},{data: "Node"},{data: "Container Image"},{data: "Container Name"},
+            {data: "Container Port"},{data: "Protocol"},{data: "Age"},{data: "Activity"},{data: "Status"}]
+    }else if (table_name=="services"){
+        columns = [{data: "Name",},{data: "Cluster IP"},{data: "Node Port"},{data: "Port"},
+                    {data: "Protocol"},{data: "Target Port" },{data: "Type"},{data: "Age"},{data: "Delete"}]
+    }else if (table_name="deployments"){
+        columns = [{data: "Name",},{data: "Last Update Time"},{data: "Reason"},
+                    {data: "Type"},{data: "Replicas"},{data: "Status"},{data: "Age"},{data: "Delete"}]
+    }
+    $("#"+table_name+"_table").DataTable( {
+        "responsive": true,
+        "autoWidth": false,
+        "ajax": function(data, callback, settings){
+            $.ajax({
+                url: "/"+table_name,
+                data: data,
+                success:function(data){
+                    if (data['code'] == "200"){
+                        callback(data[table_name])
+                        refresh_table(table_name)
+                    }else{
+                        if (data['code'] == "202"){
+                            growl(data['message'],"info")
+                            var data = {"data":[]}
+                            callback(data)
+                            re_initialise_table(table_name)
+                        }
+                    }
+                },
+                error:function(data){
+                    growl("Internal Server Error. Try to refresh page or contact support","danger")
+                }
+            })
+        },
+        'columns': columns
+    });
+}
+
+function re_initialise_table(name){
+    setTimeout(function(){
+        $("#"+name+"_table").DataTable().destroy();
+        create_table(name)
+     }, 10000);
+}
+
+function refresh_table(name){
+    setTimeout( function () {
+        $("#"+name+"_table").DataTable().ajax.reload(null, false);
+    }, 10000 );
 }

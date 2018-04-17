@@ -18,16 +18,17 @@
             {{ super() }}
         {%endblock%}
     <div class="table-responsive table-hover">
-    </br>
-    <table id="deployments_table" class="table">
+    <br>
+    <table id="services_table" class="table">
         <thead>
         <tr>
             <th>Name</th>
-            <th>last Update Time</th>
-            <th>Reason</th>
+            <th>Cluster IP</th>
+            <th>Node Port</th>
+            <th>Port</th>
+            <th>Protocol</th>
+            <th>Target Port</th>
             <th>Type</th>
-            <th>Replicas</th>
-            <th>Status</th>
             <th>Age</th>
             <th>Delete</th>
         </tr>
@@ -39,7 +40,7 @@
 <script>
         $("#register").hide();
         $("#login").hide();
-        $("#deployNavLink").addClass("active");
-        create_table("deployments");
+        $("#servicesNavLink").addClass("active");
+        create_table("services");
 </script>
 {% endblock %}

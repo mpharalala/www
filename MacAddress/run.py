@@ -30,7 +30,7 @@ def database_connection():
     try:
         db.create_all()
     except Exception as e:
-        flash("Internal Database Error. PLease Try Again Or Contact Support")
+        flash("Lost Connection To Database. Please Try Again Or Contact Support")
         print e
 
 
@@ -143,33 +143,213 @@ class LogIn(Resource):
             return {"message": "This Base Station Is Not Registered. Please Register Base Station", "code": 403}
 
 
+def get_nodes():
+    try:
+        nodes = requests.get('http://{}:5000'.format(kubeApiIpAddress), data={'method': 'get_nodes'})
+        json_nodes = json.loads(nodes.content)
+        return json_nodes
+    except Exception as e:
+        print e
+        if str(e) == "No JSON object could be decoded":
+            return "Non_Json"
+        else:
+            return False
+
+
+class Nodes(Resource):
+    def get(self):
+        if current_user.is_authenticated:
+            nodes = get_nodes()
+            if nodes:
+                if nodes == "Non_Json":
+                    return {"message": "Please Wait While Cluster Is Booting Up", "code": 202}
+                else:
+                    data = {"data":[]}
+                    for node in nodes:
+                        node['Disk'] = node["Info"][0]
+                        node['Memory'] = node["Info"][1]
+                        node['Disk Pressure'] = node["Info"][2]
+                        if node['Ready'] == "True":
+                            node['Activity'] = '<label class="">' \
+                                               '<span style="color:green" class="fa fa-check-circle fa-2x"></span></label>'
+                            node['Status'] = "Ready"
+                        else:
+                            node['Status'] = "Dead"
+                            node['Activity'] = "<label><span style='color:red' class='fa fa-times-circle fa-2x'></span></label>"
+                        data['data'].append(node)
+                    return {"nodes": data, "code": 200}
+            else:
+                return {"message": "Establishing Connection...", "code": 202}
+        else:
+            return {"message": "Please Log in to access this resource", 'code': 202}
+
+
+def get_pods():
+    try:
+        owner = 0
+        if current_user_is_owner():
+            owner = 1
+        pods = requests.get('http://{}:5000'.format(kubeApiIpAddress),
+                            data={'method': 'get_pods', 'namespace': current_user.email, 'owner': owner})
+        json_pods = json.loads(pods.content)
+        return json_pods
+    except Exception as e:
+        print e
+        return False
+
+
+class Pods(Resource):
+    def get(self):
+        if current_user.is_authenticated:
+            pods = get_pods()
+            if pods:
+                    data = {'data': []}
+                    for pod in pods:
+                        pod['Container Image'] = pod['Info'][0]['Container name']
+                        pod['Container Name'] = pod['Info'][0]['Container name']
+                        pod['Container Port'] = pod['Info'][0]['Ports'][0]['containerPort']
+                        pod['Protocol'] = pod['Info'][0]['Ports'][0]['protocol']
+                        if pod["Status"] == "Pending":
+                            pod["Activity"] = '<label><span style="color:orange" class="fa fa-spinner fa-2x"></span></label>'
+                        else:
+                            if pod['Status'] == "Running":
+                                pod["Activity"] = ' <label><span style="color:green" class="fa fa-check-circle fa-2x"></span></label>'
+                            else:
+                                pod["Activity"] = '  <label><span style="color:red" class="fa fa-times-circle fa-2x"></span></label>'
+                        data['data'].append(pod)
+                    return {"pods": data, "code": 200}
+            else:
+                return {"message": "No Pods Found", "code": 202}
+        else:
+            return {"message": "Please Log in to access this resource", 'code': 202}
+
+
 class Services(Resource):
-    def post(self):
+    def delete(self):
         if current_user.is_authenticated:
             parser = reqparse.RequestParser()
             parser.add_argument("name", type=str, help="Please enter a valid service name", required=True)
             args = parser.parse_args()
             response = delete_service(args['name'])
             if response['status'] == "Failure":
-                return {"message": "Failed to delete service. Try again", "code": 500}
+                return {"message": "Failed to delete service. {}".format(response['message']), "code": 500}
             if response['status'] == "Success":
                 flash("{} service removed successfully".format(args['name']), 'success')
                 return {"message": "Service removed successfully", "code": 200}
         else:
             abort(404)
 
+    def get(self):
+        if current_user.is_authenticated:
+            try:
+                owner = 0
+                if current_user_is_owner():
+                    owner = 1
+                services = requests.get('http://{}:5000'.format(kubeApiIpAddress),
+                                        data={'method': 'get_services', 'namespace': current_user.email,
+                                              "owner": owner})
+                json_services = json.loads(services.content)
+            except Exception as e:
+                print e
+                json_services = False
+            services = json_services
+            if services:
+                    data = {'data': []}
+                    for service in services:
+                        if service["Name"] != "kubernetes":
+                            service['Cluster IP'] = service['Info']['clusterIP']
+                            service['Node Port'] = service['Info']['ports'][0]['nodePort']
+                            service['Port'] = service['Info']['ports'][0]['port']
+                            service['Protocol'] = service['Info']['ports'][0]['protocol']
+                            service['Target Port'] = service['Info']['ports'][0]['targetPort']
+                            service['Type'] = service['Info']['type']
+                            service['Type'] = service['Info']['type']
+                            service['Delete'] = ''' <button onClick="delete_service('{}')" class="btn btn-danger btn-xs" data-toggle="modal"data-target="#confirmModal"><span class="fa fa-trash-o"></span>Delete</button>'''.format(service["Name"])
+                            data['data'].append(service)
+                    return {"services": data, "code": 200}
+            else:
+                return {"message": "No Services Found", "code": 202}
+        else:
+            return {"message": "Please Log in to access this resource", 'code': 202}
+
+
+def get_deployments():
+    try:
+        owner = 0
+        if current_user_is_owner():
+            owner = 1
+        deployments = requests.get('http://{}:5000'.format(kubeApiIpAddress),
+                                   data={'method': 'get_deployments', 'namespace': current_user.email, "owner": owner})
+        json_deployments = json.loads(deployments.content)
+        return json_deployments
+    except Exception as e:
+        print e
+        return False
 
 class Deployments(Resource):
-    def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument("name", type=str, help="Please enter a valid deployment name", required=True)
-        args = parser.parse_args()
-        response = delete_deployment(args['name'])
-        if response['status'] == "Failure":
-            return {"message": "Failed to delete deployment. Try again", "code": 500}
-        if response['status'] == "Success":
-            flash("Deployment {} removed successfully".format(args['name']))
-            return {"message": "Deployment removed successfully", "code": 200}
+    def delete(self):
+        if current_user.is_authenticated:
+            parser = reqparse.RequestParser()
+            parser.add_argument("name", type=str, help="Please enter a valid deployment name", required=True)
+            args = parser.parse_args()
+            response = delete_deployment(args['name'])
+            if response['status'] == "Failure":
+                return {"message": "Failed to delete deployment. {}".format(response["message"]), "code": 500}
+            if response['status'] == "Success":
+                flash("Deployment {} removed successfully".format(args['name']))
+                return {"message": "Deployment removed successfully", "code": 200}
+        else:
+            return {"message": "Please Log in to access this resource", 'code': 202}
+
+    def get(self):
+        if current_user.is_authenticated:
+            try:
+                owner = 0
+                if current_user_is_owner():
+                    owner = 1
+                deployments = requests.get('http://{}:5000'.format(kubeApiIpAddress),
+                                           data={'method': 'get_deployments', 'namespace': current_user.email,
+                                                 "owner": owner})
+                json_deployments = json.loads(deployments.content)
+            except Exception as e:
+                print e
+                json_deployments = False
+            if json_deployments:
+                    deployments = {'data': []}
+                    for deployment in json_deployments:
+                        iterator = 0
+                        while iterator < len(deployment['Info']['conditions']):
+                            filtered_deployment = {}
+                            filtered_deployment['Name'] = deployment["Name"]
+                            filtered_deployment['Age'] = deployment['Age']
+                            filtered_deployment['Type'] = deployment['Info']['conditions'][iterator]['type']
+                            filtered_deployment['Replicas'] = deployment['Info']['replicas']
+                            filtered_deployment['Last Update Time'] = deployment['Info']['conditions'][iterator]['lastUpdateTime']
+                            filtered_deployment['Reason'] = deployment['Info']['conditions'][iterator]['reason']
+                            filtered_deployment['Type'] = deployment['Info']['conditions'][iterator]['type']
+                            if deployment['Info']['conditions'][iterator]['status'] == "True":
+                                filtered_deployment['Status'] = """  <label class="">
+                                                                <span style="color:green" class="fa fa-check-circle fa-2x">
+                                                                </span>
+                                                            </label>"""
+                            else:
+                                filtered_deployment['Status'] = """  <label class="">
+                                                                <span style="color:red" class="fa fa-times-circle fa-2x">
+                                                                </span>
+                                                            </label>"""
+
+                            filtered_deployment['Delete'] = """<button onclick="delete_deployment('{}')"
+                                                        class="btn btn-danger btn-xs" data-toggle="modal"
+                                                        data-target="#confirmModal">
+                                                        <span class="fa fa-trash-o"></span>Delete
+                                                        </button>""".format(deployment["Name"])
+                            deployments['data'].append(filtered_deployment)
+                            iterator = iterator + 1
+                    return {"deployments": deployments, "code": 200}
+            else:
+                return {"message": "No deployments Found", "code": 202}
+        else:
+            return {"message": "Please Log in to access this resource", 'code': 202}
 
 
 class Register(Resource):
@@ -223,19 +403,6 @@ def home():
                            registered=base_station_registered())
 
 
-def get_nodes():
-    try:
-        nodes = requests.get('http://{}:5000'.format(kubeApiIpAddress), data={'method': 'get_nodes'})
-        json_nodes = json.loads(nodes.content)
-        return json_nodes
-    except Exception as e:
-        print e
-        if str(e) == "No JSON object could be decoded":
-            return "Non_Json"
-        else:
-            return False
-
-
 def current_user_is_owner():
     address = MacAddresses.query.filter_by(mac_address=get_address()).first()
     schema = MacAddressesSchema()
@@ -249,46 +416,11 @@ def current_user_is_owner():
         return False
 
 
-def get_pods():
-    try:
-        owner = 0
-        if current_user_is_owner():
-            owner = 1
-        pods = requests.get('http://{}:5000'.format(kubeApiIpAddress),
-                            data={'method': 'get_pods', 'namespace': current_user.email, 'owner': owner})
-        json_pods = json.loads(pods.content)
-        return json_pods
-    except Exception as e:
-        print e
-        return False
 
 
-def get_services():
-    try:
-        owner = 0
-        if current_user_is_owner():
-            owner = 1
-        services = requests.get('http://{}:5000'.format(kubeApiIpAddress),
-                                data={'method': 'get_services', 'namespace': current_user.email, "owner": owner})
-        json_services = json.loads(services.content)
-        return json_services
-    except Exception as e:
-        print e
-        return False
 
 
-def get_deployments():
-    try:
-        owner = 0
-        if current_user_is_owner():
-            owner = 1
-        deployments = requests.get('http://{}:5000'.format(kubeApiIpAddress),
-                                   data={'method': 'get_deployments', 'namespace': current_user.email, "owner": owner})
-        json_deployments = json.loads(deployments.content)
-        return json_deployments
-    except Exception as e:
-        print e
-        return False
+
 
 
 def deploy_app(name, image, port, replicas):
@@ -329,7 +461,6 @@ def delete_deployment(name):
         delete = requests.post('http://{}:5000'.format(kubeApiIpAddress),
                                data={'method': 'delete_deployment',
                                      'namespace': current_user.email, 'name': name, "owner":owner})
-        print delete.content
         delete_json = json.loads(delete.content)
         return delete_json
     except Exception as e:
@@ -344,7 +475,6 @@ def create_service(name, port):
             owner = 1
         check_deployment = requests.post('http://{}:5000'.format(kubeApiIpAddress),
                                data={'method': 'check_deployment', 'namespace': current_user.email, 'name': name})
-        print check_deployment.text
         if check_deployment.text == "1":
             service = requests.post('http://{}:5000'.format(kubeApiIpAddress),
                                    data={'method': 'service', 'namespace': current_user.email,
@@ -392,42 +522,13 @@ def delete_service(name):
 @login_required
 def dashboard(method):
     if method == "nodes":
-        nodes = get_nodes()
-        if nodes == {} or nodes == [] or nodes == "Non_Json":
-            flash("Please wait while cluster is booting up", 'info')
-            nodes = {}
-        else:
-            if nodes == False:
-                flash("Establishing Connection ...", 'info')
-                nodes = {}
-        return render_template("nodes.html", data=nodes, title="Dashboard")
+        return render_template("nodes_ajax.html", title="Dashboard")
     elif method == "pods":
-        data = get_pods()
-        if not data:
-            if data == {} or data == []:
-                flash("Could not find any pods", 'danger')
-            else:
-                flash("Establishing Connection ...", 'info')
-                data = {}
-        return render_template("pods.html", data=data, title="Dashboard")
+        return render_template("pods_ajax.html", title="Dashboard")
     elif method == "services":
-        data = get_services()
-        if not data:
-            if data == {} or data == []:
-                flash("No services found",'danger')
-            else:
-                flash("Establishing Connection ...", 'info')
-                data = {}
-        return render_template("services.html", data=data, title="Dashboard")
+        return render_template("services_ajax.html", title="Dashboard")
     elif method == "deployments":
-        data = get_deployments()
-        if not data:
-            if data == {} or data == []:
-                flash("There are no apps currently deployed", 'danger')
-            else:
-                flash("Establishing Connection ...", 'info')
-                data = {}
-        return render_template("deployments.html", data=data, title="Dashboard")
+        return render_template("deployments.html", title="Dashboard")
     elif method == "deploy":
         if request.method == "POST":
             name = request.values.get("name")
@@ -435,25 +536,31 @@ def dashboard(method):
             port = request.values.get("port")
             replicas = request.values.get("replicas")
             deploy_json = deploy_app(name, image, port, replicas)
-            if deploy_json['status'] != "Failure":
-                flash("App Successfully Deployed", 'success')
-                return redirect(url_for("dashboard", method="deployments"))
+            if deploy_json:
+                if deploy_json['status'] != "Failure":
+                    flash("App Successfully Deployed", 'success')
+                    return redirect(url_for("dashboard", method="deployments"))
+                else:
+                    flash("Failed to deploy App. {}".format(deploy_json['reason']), 'danger')
             else:
-                flash("Failed to deploy App. {}".format(deploy_json['reason'], 'danger'))
+                flash("Failed to deploy App. {}".format("Failed to establish Connection"), 'danger')
         return render_template("deploy.html", title="Dashboard")
     elif method == "create_service":
         if request.method == "POST":
             name = request.values.get("name")
             port = request.values.get("port")
             deploy_json = create_service(name, port)
-            if deploy_json == "NotAvailable":
-                flash("Deployment Not Available", "danger")
-            else:
-                if deploy_json['status'] != "Failure":
-                    flash("Service Successfully Created", 'success')
-                    return redirect(url_for("dashboard", method="services"))
+            if deploy_json:
+                if deploy_json == "NotAvailable":
+                    flash("Deployment Not Found", "danger")
                 else:
-                    flash("Failed to create service. {}".format(deploy_json['reason']), 'danger')
+                    if deploy_json['status'] != "Failure":
+                        flash("Service Successfully Created", 'success')
+                        return redirect(url_for("dashboard", method="services"))
+                    else:
+                        flash("Failed to create service. {}".format(deploy_json['reason']), 'danger')
+            else:
+                flash("Failed to create service. {}".format("Failed to establish Connection"), 'danger')
         return render_template("create_service.html", title="Dashboard")
     elif method == "update_deployment":
         if request.method == "POST":
@@ -462,22 +569,28 @@ def dashboard(method):
             port = request.values.get("port")
             replicas = request.values.get("replicas")
             update_deployment_json = update_deployment(name, image, port, replicas)
-            if update_deployment_json['status'] != "Failure":
-                flash("App Successfully Deployed", 'success')
-                return redirect(url_for("dashboard", method="deployments"))
+            if update_deployment_json:
+                if update_deployment_json['status'] != "Failure":
+                    flash("App Successfully Deployed", 'success')
+                    return redirect(url_for("dashboard", method="deployments"))
+                else:
+                    flash("Failed to update App. {}".format(update_deployment_json['reason']), 'danger')
             else:
-                flash("Failed to update App. {}".format(update_deployment_json['reason']), 'danger')
+                flash("Failed to update App. {}".format("Failed to establish Connection"), 'danger')
         return render_template("updateDeployment.html", title="Dashboard")
     elif method == "update_service":
         if request.method == "POST":
             name = request.values.get("name")
             port = request.values.get("port")
             update_json = update_service(name, port)
-            if update_json['status'] != "Failure":
-                flash("Service Successfully Created", 'success')
-                return redirect(url_for("dashboard", method="services"))
+            if update_json:
+                if update_json['status'] != "Failure":
+                    flash("Service Successfully Created", 'success')
+                    return redirect(url_for("dashboard", method="services"))
+                else:
+                    flash("Failed to update service. {}".format(update_json['reason']), 'danger')
             else:
-                flash("Failed to update service. {}".format(update_json['reason']), 'danger')
+                flash("Failed to update service. {}".format("Failed to establish Connection"), 'danger')
         return render_template("updateService.html", title="Dashboard")
     else:
         abort(404)
@@ -494,10 +607,12 @@ def logout():
 api.add_resource(UserApi, '/user_exists')
 api.add_resource(LogIn, '/login')
 api.add_resource(Register, '/register_address')
-api.add_resource(Deployments, '/delete/deployment/')
-api.add_resource(Services, '/delete/service/')
+api.add_resource(Nodes, '/nodes')
+api.add_resource(Pods, '/pods')
+api.add_resource(Services, '/services')
+api.add_resource(Deployments, '/deployments')
 
 
 if __name__ == "__main__":
     db.create_all()
-    app.run(port=5001, debug=True)
+    app.run(port=5001, debug=True, threaded=True)

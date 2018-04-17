@@ -17,29 +17,30 @@
         {%block nav_tabs%}
             {{ super() }}
         {%endblock%}
-    <div class="table-responsive table-hover">
-    </br>
-    <table id="deployments_table" class="table">
+    <div class="table-responsive  table-hover">
+    <br>
+    <table id="nodes_table" class="table">
         <thead>
         <tr>
             <th>Name</th>
-            <th>last Update Time</th>
-            <th>Reason</th>
-            <th>Type</th>
-            <th>Replicas</th>
-            <th>Status</th>
+            <th>Disk</th>
+            <th>Memory</th>
+            <th>Disk Pressure</th>
             <th>Age</th>
-            <th>Delete</th>
+            <th>Activity</th>
+            <th>Status</th>
         </tr>
         </thead>
     </table>
-    </div>
+</div>
     </div>
 </div>
 <script>
+    $(document).ready(function(){
         $("#register").hide();
         $("#login").hide();
-        $("#deployNavLink").addClass("active");
-        create_table("deployments");
+        $("#nodesNavLink").addClass("active");
+        create_table("nodes");
+    })
 </script>
 {% endblock %}
