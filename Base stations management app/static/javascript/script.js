@@ -292,10 +292,10 @@ function create_table(table_name){
             {data: "Container Port"},{data: "Protocol"},{data: "Age"},{data: "Activity"},{data: "Status"}]
     }else if (table_name=="services"){
         columns = [{data: "Name",},{data: "Cluster IP"},{data: "Node Port"},{data: "Port"},
-                    {data: "Protocol"},{data: "Target Port" },{data: "Type"},{data: "Age"},{data: "Delete"}]
+                    {data: "Protocol"},{data: "Target Port" },{data: "Type"},{data: "Age"},{data: "Delete"},{data: "Edit"}]
     }else if (table_name="deployments"){
         columns = [{data: "Name",},{data: "Last Update Time"},{data: "Reason"},
-                    {data: "Type"},{data: "Replicas"},{data: "Status"},{data: "Age"},{data: "Delete"}]
+                    {data: "Type"},{data: "Replicas"},{data: "Status"},{data: "Age"},{data: "Delete"}, {data: "Edit"}]
     }
     $("#"+table_name+"_table").DataTable( {
         "responsive": true,
@@ -337,4 +337,104 @@ function refresh_table(name){
     setTimeout( function () {
         $("#"+name+"_table").DataTable().ajax.reload(null, false);
     }, 10000 );
+}
+
+function edit_deployment(name, image){
+    $("#overview_modal").modal("hide")
+    $("#update_modal").modal()
+    $("#update_name").val(name)
+    $("#update_modal_title").html("Update Deployment")
+    $("#update_replicas_input").show();
+    $("#update_replicas").prop("disabled", false);
+     $("#update_form").off();
+     $('#update_form').submit(function(){
+        $('#submit_update').addClass("disabled")
+        var name = $('#update_name').val()
+        var port = $('#update_port').val()
+        var replicas = $('#update_replicas').val()
+        $.ajax({
+                url:"/dashboard/update_deployment",
+                data:{name:name, image:image, port:port, replicas:replicas},
+                type:"POST"
+            })
+            .done(
+                    function(data){
+                        if (data['code']=="200"){
+                            growl(data["message"],"success")
+                            $('#submit_update').removeClass("disabled")
+                             $("#update_form").trigger('reset');
+//                            $('#update_name').val(" ")
+//                            $('#update_port').val(" ")
+//                            $('#update_replicas').val(" ")
+                            $("#update_modal").modal("hide")
+                        }else{
+                            if (data['code']=="500"){
+                                growl(data["message"],"danger")
+                            }else{
+                                growl("Internal Server Error. Please Try again or contact admin","danger")
+                            }
+                            $('#submit_update').removeClass("disabled")
+                        }
+                    }
+                )
+            .fail(
+            function(){
+                growl("Internal Server Error. Please Try again or contact admin","danger")
+                $('#submit_update').removeClass("disabled")
+            })
+            .always({
+                function(){
+
+                }
+            })
+    });
+}
+
+function edit_service(name){
+    $("#overview_modal").modal("hide")
+    $("#update_modal").modal()
+    $("#update_name").val(name)
+    $("#update_modal_title").html("Update Service")
+    $("#update_form").off();
+    $("#update_replicas_input").hide();
+    $("#update_replicas").prop("disabled", true);
+    $('#update_form').submit(function(){
+        $('#submit_update').addClass("disabled")
+        var mac_address = $('#mac_address').val()
+        var name = $('#update_name').val()
+        var port = $('#update_port').val()
+        $.ajax({
+                url:"/dashboard/update_service",
+                data:{name:name, port:port},
+                type:"POST"
+            })
+            .done(
+                    function(data){
+                        if (data['code']=="200"){
+                            growl(data["message"],"success")
+                            $('#submit_update').removeClass("disabled")
+                             $("#update_form").trigger('reset');
+                            $("#update_modal").modal("hide")
+                            $("#overview_modal").modal()
+                        }else{
+                            if (data['code']=="500"){
+                                growl(data["message"],"danger")
+                            }else{
+                                growl("Internal Server Error. Please Try again or contact admin","danger")
+                            }
+                            $('#submit_update').removeClass("disabled")
+                        }
+                    }
+                )
+            .fail(
+            function(){
+                growl("Internal Server Error. Please Try again or contact admin","danger")
+                $('#submit_update').removeClass("disabled")
+            })
+            .always({
+                function(){
+
+                }
+            })
+    });
 }
