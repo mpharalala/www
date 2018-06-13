@@ -390,11 +390,10 @@ class Deployments(Resource):
     # Method to get the apps deployed by the user
     def get(self):
 
-        # Check if the user is authenticed
+        # Check if the user is authenticated
         if current_user.is_authenticated:
 
             json_deployments = get_deployments()
-
 
             # Start looping if there are deployments
             if json_deployments:
@@ -536,7 +535,7 @@ def deploy_app(name, image, port, replicas):
     try:
         owner = 0
 
-        #Check if this user is the owner of the base station
+        # Check if this user is the owner of the base station
         if current_user_is_owner():
             owner = 1
 
