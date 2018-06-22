@@ -14,10 +14,11 @@ app = Flask(__name__)
 api = Api(app)
 
 # Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:pass@192.168.0.2/addresses'
-app.config['SQLALCHEMY_BINDS'] = {"users_database": "mysql://root:pass@192.168.0.2/users"}
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:password@192.168.88.241:3307/addresses'
+app.config['SQLALCHEMY_BINDS'] = {"users_database": "mysql://root:password@192.168.88.241:3308/users"}
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = "random string"
+
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
@@ -28,7 +29,7 @@ login_manager.login_view = "home"
 login_manager.login_message = "Please Logging To View Dashboard"
 
 # Api ip address
-kubeApiIpAddress = "192.168.0.8:8000"
+kubeApiIpAddress = "192.168.88.253:8000"
 
 
 # Load user to logging manager
@@ -154,11 +155,13 @@ class LogIn(Resource):
             user_dictionary = UsersSchema().dump(user).data
 
             # Log a user in if their password mathces
-            if (user_dictionary.get('email') == args['email']) \
-                    and (user_dictionary.get('password') == hashlib.sha256(args['password']).hexdigest()):
-                login_user(user)
-                flash("Login Successful")
-                return {"message": "Login Successful", "code": 100}
+            if (user_dictionary.get('email') == args['email']) and (user_dictionary.get('password') == hashlib.sha256(args['password']).hexdigest()):
+                if user_is_owner(user_dictionary['id']):
+                    login_user(user)
+                    flash("Login Successful")
+                    return {"message": "Login Successful", "code": 100}
+                else:
+                    return {"message": "Sorry. You Can  Only Log In To A Base Station That Belongs To You", "code": 401}
             else:
                 return {"message": "Invalid username or password", "code": 401}
         else:
@@ -284,23 +287,23 @@ class Pods(Resource):
 class Services(Resource):
 
     # method to delete a base station
-    def delete(self):
-        if current_user.is_authenticated:
-
-            # Parse arguments from the api
-            parser = reqparse.RequestParser()
-            parser.add_argument("name", type=str, help="Please enter a valid service name", required=True)
-            args = parser.parse_args()
-
-            # send delete request to api
-            response = delete_service(args['name'])
-            if response['status'] == "Failure":
-                return {"message": "Failed to delete service. {}".format(response['message']), "code": 500}
-            if response['status'] == "Success":
-                flash("{} service removed successfully".format(args['name']), 'success')
-                return {"message": "Service removed successfully", "code": 200}
-        else:
-            abort(404)
+    # def delete(self):
+    #     if current_user.is_authenticated:
+    #
+    #         # Parse arguments from the api
+    #         parser = reqparse.RequestParser()
+    #         parser.add_argument("name", type=str, help="Please enter a valid service name", required=True)
+    #         args = parser.parse_args()
+    #
+    #         # send delete request to api
+    #         response = delete_service(args['name'])
+    #         if response['status'] == "Failure":
+    #             return {"message": "Failed to delete service. {}".format(response['message']), "code": 500}
+    #         if response['status'] == "Success":
+    #             flash("{} service removed successfully".format(args['name']), 'success')
+    #             return {"message": "Service removed successfully", "code": 200}
+    #     else:
+    #         abort(404)
 
     # Method to get all base stations
     def get(self):
@@ -367,25 +370,25 @@ def get_deployments():
 
 # Get all deployments of the base station
 class Deployments(Resource):
-    def delete(self):
-
-        # Check if the user is authenticated
-        if current_user.is_authenticated:
-
-            # parse arguments from the request
-            parser = reqparse.RequestParser()
-            parser.add_argument("name", type=str, help="Please enter a valid deployment name", required=True)
-            args = parser.parse_args()
-
-            # Send delete request to the api
-            response = delete_deployment(args['name'])
-            if response['status'] == "Failure":
-                return {"message": "Failed to delete deployment. {}".format(response["message"]), "code": 500}
-            if response['status'] == "Success":
-                flash("Deployment {} removed successfully".format(args['name']))
-                return {"message": "Deployment removed successfully", "code": 200}
-        else:
-            return {"message": "Please Log in to access this resource", 'code': 202}
+    # def delete(self):
+    #
+    #     # Check if the user is authenticated
+    #     if current_user.is_authenticated:
+    #
+    #         # parse arguments from the request
+    #         parser = reqparse.RequestParser()
+    #         parser.add_argument("name", type=str, help="Please enter a valid deployment name", required=True)
+    #         args = parser.parse_args()
+    #
+    #         # Send delete request to the api
+    #         response = delete_deployment(args['name'])
+    #         if response['status'] == "Failure":
+    #             return {"message": "Failed to delete deployment. {}".format(response["message"]), "code": 500}
+    #         if response['status'] == "Success":
+    #             flash("Deployment {} removed successfully".format(args['name']))
+    #             return {"message": "Deployment removed successfully", "code": 200}
+    #     else:
+    #         return {"message": "Please Log in to access this resource", 'code': 202}
 
     # Method to get the apps deployed by the user
     def get(self):
@@ -402,42 +405,41 @@ class Deployments(Resource):
                     iterator = 0
                     print deployment
                     # Filter deployments for data tables
-                    while iterator < len(deployment['Status']['conditions']):
-                        filtered_deployment = {}
-                        filtered_deployment['Name'] = deployment["Name"]
-                        time_stamp = parser.parse(deployment["Created"])
-                        time_stamp = time_stamp.replace(tzinfo=None)
-                        age = datetime.now() - time_stamp
-                        age = str(age).split(":")
-                        age = age[0] + "h " + age[1] + "m"
-                        filtered_deployment['Age'] = str(age)
-                        filtered_deployment['Type'] = deployment['Status']['conditions'][iterator]['type']
-                        filtered_deployment['Replicas'] = deployment['Status']['replicas']
-                        filtered_deployment['Last Update Time'] = deployment['Status']['conditions'][iterator][
-                            'lastUpdateTime']
-                        filtered_deployment['Reason'] = deployment['Status']['conditions'][iterator]['reason']
-                        filtered_deployment['Type'] = deployment['Status']['conditions'][iterator]['type']
-                        filtered_deployment['Edit'] = ''' <button onClick="edit_deployment('{}','{}')"
-                                                     class="btn btn-info btn-xs"><span class="fa fa-edit">
-                                                     </span>Edit</button>'''.format(deployment["Name"], deployment['Info']['template']['spec']['containers'][0]['image'])
-                        if deployment['Status']['conditions'][iterator]['status'] == "True":
-                            filtered_deployment['Status'] = """  <label class="">
-                                                                <span style="color:green" class="fa fa-check-circle fa-2x">
-                                                                </span>
-                                                            </label>"""
-                        else:
-                            filtered_deployment['Status'] = """  <label class="">
-                                                                <span style="color:red" class="fa fa-times-circle fa-2x">
-                                                                </span>
-                                                            </label>"""
+                    filtered_deployment = {}
+                    filtered_deployment['Name'] = deployment["Name"]
+                    time_stamp = parser.parse(deployment["Created"])
+                    time_stamp = time_stamp.replace(tzinfo=None)
+                    age = datetime.now() - time_stamp
+                    age = str(age).split(":")
+                    age = age[0] + "h " + age[1] + "m"
+                    filtered_deployment['Age'] = str(age)
+                    filtered_deployment['Type'] = deployment['Status']['conditions'][iterator]['type']
+                    filtered_deployment['Replicas'] = deployment['Status']['replicas']
+                    filtered_deployment['Last Update Time'] = deployment['Status']['conditions'][iterator][
+                        'lastUpdateTime']
+                    filtered_deployment['Reason'] = deployment['Status']['conditions'][iterator]['reason']
+                    filtered_deployment['Type'] = deployment['Status']['conditions'][iterator]['type']
+                    # filtered_deployment['Edit'] = ''' <button onClick="edit_deployment('{}','{}')"
+                    #                              class="btn btn-info btn-xs"><span class="fa fa-edit">
+                    #                              </span>Edit</button>'''.format(deployment["Name"], deployment['Info']['template']['spec']['containers'][0]['image'])
+                    if deployment['Status']['conditions'][iterator]['status'] == "True":
+                        filtered_deployment['Status'] = """  <label class="">
+                                                            <span style="color:green" class="fa fa-check-circle fa-2x">
+                                                            </span>
+                                                        </label>"""
+                    else:
+                        filtered_deployment['Status'] = """  <label class="">
+                                                            <span style="color:red" class="fa fa-times-circle fa-2x">
+                                                            </span>
+                                                        </label>"""
 
-                        filtered_deployment['Delete'] = """<button onclick="delete_deployment('{}')"
-                                                        class="btn btn-danger btn-xs" data-toggle="modal"
-                                                        data-target="#confirmModal">
-                                                        <span class="fa fa-trash-o"></span>Delete
-                                                        </button>""".format(deployment["Name"])
-                        deployments['data'].append(filtered_deployment)
-                        iterator = iterator + 1
+                    # filtered_deployment['Delete'] = """<button onclick="delete_deployment('{}')"
+                    #                                 class="btn btn-danger btn-xs" data-toggle="modal"
+                    #                                 data-target="#confirmModal">
+                    #                                 <span class="fa fa-trash-o"></span>Delete
+                    #                                 </button>""".format(deployment["Name"])
+                    # print filtered_deployment
+                    deployments['data'].append(filtered_deployment)
                 return {"deployments": deployments, "code": 200}
             else:
                 return {"message": "No deployments Found", "code": 202}
@@ -523,6 +525,23 @@ def current_user_is_owner():
     if results:
         # Verify if the user owns it
         if current_user.id == results['user_id']:
+            return True
+        else:
+            return False
+    else:
+        return False
+
+
+# Function to check if the user owns the base station
+def user_is_owner(user_id):
+
+    # Get the base station and the user registed in the dataabse
+    address = MacAddresses.query.filter_by(mac_address=get_address()).first()
+    schema = MacAddressesSchema()
+    results = schema.dump(address).data
+    if results:
+        # Verify if the user owns it
+        if user_id == results['user_id']:
             return True
         else:
             return False
@@ -655,92 +674,92 @@ def dashboard(method):
         return render_template("services_ajax.html", title="Dashboard")
     elif method == "deployments":
         return render_template("deployments.html", title="Dashboard")
-    elif method == "deploy":
-
-        # Deploy an app to the base station
-
-        if request.method == "POST":
-            name = request.values.get("name")
-            image = request.values.get("image")
-            port = request.values.get("port")
-            replicas = request.values.get("replicas")
-
-            # The api returns a json response
-
-            deploy_json = json.loads(deploy_app(name, image, port, replicas)['deployment_response'])
-            print deploy_json
-            if deploy_json:
-                if deploy_json['status'] != "Failure":
-                    flash("App Successfully Deployed", 'success')
-                    return redirect(url_for("dashboard", method="deployments"))
-                else:
-                    flash("Failed to deploy App. {}".format(deploy_json['reason']), 'danger')
-            else:
-                flash("Failed to deploy App. {}".format("Failed to establish Connection"), 'danger')
-        return render_template("deploy.html", title="Dashboard")
-
-    # Create a service method
-    elif method == "create_service":
-        if request.method == "POST":
-
-            # Request values from the form
-
-            name = request.values.get("name")
-            port = request.values.get("port")
-            deploy_json = create_service(name, port)
-
-            # If there is a response from the api
-            if deploy_json:
-                print deploy_json
-                if deploy_json['status'] != "Failure":
-                    flash("Service Successfully Created", 'success')
-                    return redirect(url_for("dashboard", method="services"))
-                else:
-                    flash("Failed to create service. {}".format(deploy_json['message']), 'danger')
-            else:
-                flash("Failed to create service. {}".format("Failed to establish Connection"), 'danger')
-        return render_template("create_service.html", title="Dashboard")
-
-    # Update deployment method
-    elif method == "update_deployment":
-        if request.method == "POST":
-
-            # Get values from the form
-
-            name = request.values.get("name")
-            image = request.values.get("image")
-            port = request.values.get("port")
-            replicas = request.values.get("replicas")
-            update_deployment_json = update_deployment(name, image, port, replicas)
-
-            # Get a json response from the API
-            if update_deployment_json:
-                if update_deployment_json['status'] != "Failure":
-                    flash("App Successfully Deployed", 'success')
-                    return redirect(url_for("dashboard", method="deployments"))
-                else:
-                    return jsonify({"message": "Failed to update App. {}".format(update_deployment_json['message']), "code": "500"})
-            else:
-                return jsonify({"message": "Failed to update App. {}".format("Failed to establish Connection"), "code" : '500'})
-
-    # Update a service method
-    elif method == "update_service":
-        if request.method == "POST":
-
-            # request values from the form
-            name = request.values.get("name")
-            port = request.values.get("port")
-            print name
-            update_json = update_service(name, port)
-            if update_json:
-                if update_json['status'] != "Failure":
-                    return jsonify({"message": "Service Successfully Created", 'code': "200"})
-                else:
-                    return jsonify({"message": "Failed to update service. {}".format(update_json['message']), "code": '500'})
-            else:
-                return jsonify(
-                    {"message": "Failed to update Service {}".format("Failed to establish Connection"), "code": '500'})
-        return render_template("updateService.html", title="Dashboard")
+    # elif method == "deploy":
+    #
+    #     # Deploy an app to the base station
+    #
+    #     # if request.method == "POST":
+    #     #     name = request.values.get("name")
+    #     #     image = request.values.get("image")
+    #     #     port = request.values.get("port")
+    #     #     replicas = request.values.get("replicas")
+    #     #
+    #     #     # The api returns a json response
+    #     #
+    #     #     deploy_json = json.loads(deploy_app(name, image, port, replicas)['deployment_response'])
+    #     #     print deploy_json
+    #     #     if deploy_json:
+    #     #         if deploy_json['status'] != "Failure":
+    #     #             flash("App Successfully Deployed", 'success')
+    #     #             return redirect(url_for("dashboard", method="deployments"))
+    #     #         else:
+    #     #             flash("Failed to deploy App. {}".format(deploy_json['reason']), 'danger')
+    #     #     else:
+    #     #         flash("Failed to deploy App. {}".format("Failed to establish Connection"), 'danger')
+    #     return render_template("deploy.html", title="Dashboard")
+    #
+    # # Create a service method
+    # elif method == "create_service":
+    #     if request.method == "POST":
+    #
+    #         # Request values from the form
+    #
+    #         name = request.values.get("name")
+    #         port = request.values.get("port")
+    #         deploy_json = create_service(name, port)
+    #
+    #         # If there is a response from the api
+    #         if deploy_json:
+    #             print deploy_json
+    #             if deploy_json['status'] != "Failure":
+    #                 flash("Service Successfully Created", 'success')
+    #                 return redirect(url_for("dashboard", method="services"))
+    #             else:
+    #                 flash("Failed to create service. {}".format(deploy_json['message']), 'danger')
+    #         else:
+    #             flash("Failed to create service. {}".format("Failed to establish Connection"), 'danger')
+    #     return render_template("create_service.html", title="Dashboard")
+    #
+    # # Update deployment method
+    # elif method == "update_deployment":
+    #     if request.method == "POST":
+    #
+    #         # Get values from the form
+    #
+    #         name = request.values.get("name")
+    #         image = request.values.get("image")
+    #         port = request.values.get("port")
+    #         replicas = request.values.get("replicas")
+    #         update_deployment_json = update_deployment(name, image, port, replicas)
+    #
+    #         # Get a json response from the API
+    #         if update_deployment_json:
+    #             if update_deployment_json['status'] != "Failure":
+    #                 flash("App Successfully Deployed", 'success')
+    #                 return redirect(url_for("dashboard", method="deployments"))
+    #             else:
+    #                 return jsonify({"message": "Failed to update App. {}".format(update_deployment_json['message']), "code": "500"})
+    #         else:
+    #             return jsonify({"message": "Failed to update App. {}".format("Failed to establish Connection"), "code" : '500'})
+    #
+    # # Update a service method
+    # elif method == "update_service":
+    #     if request.method == "POST":
+    #
+    #         # request values from the form
+    #         name = request.values.get("name")
+    #         port = request.values.get("port")
+    #         print name
+    #         update_json = update_service(name, port)
+    #         if update_json:
+    #             if update_json['status'] != "Failure":
+    #                 return jsonify({"message": "Service Successfully Created", 'code': "200"})
+    #             else:
+    #                 return jsonify({"message": "Failed to update service. {}".format(update_json['message']), "code": '500'})
+    #         else:
+    #             return jsonify(
+    #                 {"message": "Failed to update Service {}".format("Failed to establish Connection"), "code": '500'})
+    #     return render_template("updateService.html", title="Dashboard")
     else:
         abort(404)
 

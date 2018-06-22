@@ -292,10 +292,10 @@ function create_table(table_name){
             {data: "Container Port"},{data: "Protocol"},{data: "Age"},{data: "Activity"},{data: "Status"}]
     }else if (table_name=="services"){
         columns = [{data: "Name",},{data: "Cluster IP"},{data: "Node Port"},{data: "Port"},
-                    {data: "Protocol"},{data: "Target Port" },{data: "Type"},{data: "Age"},{data: "Delete"},{data: "Edit"}]
+                    {data: "Protocol"},{data: "Target Port" },{data: "Type"},{data: "Age"}]
     }else if (table_name="deployments"){
         columns = [{data: "Name",},{data: "Last Update Time"},{data: "Reason"},
-                    {data: "Type"},{data: "Replicas"},{data: "Status"},{data: "Age"},{data: "Delete"}, {data: "Edit"}]
+                    {data: "Type"},{data: "Replicas"},{data: "Status"},{data: "Age"}]
     }
     $("#"+table_name+"_table").DataTable( {
         "responsive": true,
