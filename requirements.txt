@@ -1,9 +1,0 @@
-Flask
-flask_restful
-flask_SQLalchemy
-marshmallow_sqlalchemy
-flask_marshmallow
-passlib
-mysqlclient
-requests
-flask_login

@@ -14,8 +14,8 @@ app = Flask(__name__)
 api = Api(app)
 
 # Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:password@192.168.88.241:3307/addresses'
-app.config['SQLALCHEMY_BINDS'] = {"users_database": "mysql://root:password@192.168.88.241:3308/users"}
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:pass@localhost:3307/addresses'
+app.config['SQLALCHEMY_BINDS'] = {"users_database": "mysql://root:pass@localhost:3308/users"}
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = "random string"
 
