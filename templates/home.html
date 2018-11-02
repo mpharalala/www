@@ -39,9 +39,15 @@
         </div>
     </div>
     <div class="form-group d-none form_toggle">
+        <label class="col control-label">Internet Access Rate(RIOT Coin/MB):</label>
+        <div class="col">
+            <input type="number" name="rate" id="internet_rate" maxlength="100" placeholder="Enter Coin/MB Rate" class="form-control" required>
+        </div>
+    </div>
+    <div class="form-group d-none form_toggle">
         <label class="col control-label">Base Station Mac Address:</label>
         <div class="col">
-            <input name="mac_address" value="{{global_mac_address}}" id="mac_address" disabled maxlength="100" class="disabled form-control" required>
+            <input name="mac_address" value="{{mac_address}}" id="mac_address" disabled maxlength="100" class="disabled form-control" required>
         </div>
     </div>
     {% endif %}
